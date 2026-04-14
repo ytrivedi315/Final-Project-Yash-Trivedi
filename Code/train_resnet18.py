@@ -290,14 +290,7 @@ def main():
 
         if val_mae < best_val_mae:
             best_val_mae = val_mae
-            checkpoint = {
-                "epoch": epoch,
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "best_val_mae": best_val_mae,
-                "args": vars(args),
-            }
-            torch.save(checkpoint, output_dir / "best_resnet18_case84.pth")
+            torch.save(model.state_dict(), output_dir / "best_model_weights.pt")
             print(f"Saved new best model at epoch {epoch} with val_mae={val_mae:.5f}")
 
     with open(output_dir / "training_history.json", "w") as f:

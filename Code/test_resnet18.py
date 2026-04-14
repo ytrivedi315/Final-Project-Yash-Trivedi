@@ -154,8 +154,8 @@ def main():
     )
 
     model = ResNet18Regressor().to(device)
-    checkpoint = torch.load(args.checkpoint, map_location=device)
-    model.load_state_dict(checkpoint["model_state_dict"])
+    state_dict = torch.load(args.checkpoint, map_location=device)
+    model.load_state_dict(state_dict)
 
     criterion = nn.HuberLoss(delta=0.1)
     avg_loss, mae, rmse, r2, corr = evaluate(model, loader, criterion, device, Path(args.output_csv))
