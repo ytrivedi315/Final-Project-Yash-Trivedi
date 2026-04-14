@@ -1,3 +1,6 @@
 *.pth
 *.mp4
 .DS_Store
+*.pth
+*.mp4
+.DS_Store
