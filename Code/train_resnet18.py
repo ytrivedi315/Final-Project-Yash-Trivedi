@@ -194,7 +194,7 @@ def main():
     parser.add_argument("--val_split", type=float, default=0.2)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--freeze_backbone_epochs", type=int, default=3)
+    parser.add_argument("--freeze_backbone_epochs", type=int, default=0)
     args = parser.parse_args()
 
     set_seed(args.seed)
