@@ -206,6 +206,11 @@ def main():
 
     train_transform = transforms.Compose([
         transforms.Resize((224, 224)),
+        transforms.RandomAffine(
+            degrees=0,
+            translate=(0.02, 0.02),
+            scale=(0.98, 1.02),
+        ),
         transforms.ColorJitter(brightness=0.1, contrast=0.1),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
