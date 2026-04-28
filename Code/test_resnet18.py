@@ -14,16 +14,20 @@ from torchvision.models import ResNet18_Weights
 
 
 class CHFFrameDataset(Dataset):
+    # Class for dataset
     def __init__(self, annotations_path: str, image_dir: str, transform=None):
+        # Store paths and transform
         self.annotations_path = Path(annotations_path)
         self.image_dir = Path(image_dir)
         self.transform = transform
 
+        # Read file with labels
         if self.annotations_path.suffix.lower() == ".csv":
             self.df = pd.read_csv(self.annotations_path)
         else:
             self.df = pd.read_excel(self.annotations_path)
 
+        # Extract CHF Prox labels
         required_target_col = "CHF Proximity"
         if required_target_col not in self.df.columns:
             raise ValueError(
@@ -31,7 +35,6 @@ class CHFFrameDataset(Dataset):
                 f"Available columns: {list(self.df.columns)}"
             )
 
-        # Your extracted frames are sequentially numbered to match row order.
         self.df["frame_filename"] = [f"frame_{i:04d}.png" for i in range(len(self.df))]
 
         self.df[required_target_col] = self.df[required_target_col].clip(0.0, 1.0)
@@ -60,7 +63,7 @@ class CHFFrameDataset(Dataset):
 class ResNet18Regressor(nn.Module):
     def __init__(self):
         super().__init__()
-        self.backbone = models.resnet18(weights=None)
+        self.backbone = models.resnet18(weights=None) # Does not load pretrained weights in testing
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Sequential(
             nn.Dropout(p=0.2),
@@ -88,6 +91,7 @@ def evaluate(model, loader, criterion, device, output_csv: Path):
         loss = criterion(preds, targets)
         total_loss += loss.item() * images.size(0)
 
+        # Save predictions back to CPU
         preds_np = preds.cpu().numpy().reshape(-1)
         targets_np = targets.cpu().numpy().reshape(-1)
 
@@ -117,6 +121,7 @@ def evaluate(model, loader, criterion, device, output_csv: Path):
 
     avg_loss = total_loss / len(loader.dataset)
 
+    # Write the output results to a .csv file
     with open(output_csv, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
@@ -127,7 +132,7 @@ def evaluate(model, loader, criterion, device, output_csv: Path):
 
 def main():
     parser = argparse.ArgumentParser(description="Test ResNet-18 on case 91 for CHF proximity regression.")
-    parser.add_argument("--checkpoint", type=str, required=True, help="Path to trained .pth file")
+    parser.add_argument("--checkpoint", type=str, required=True, help="Path to trained .pt file")
     parser.add_argument("--annotations", type=str, required=True, help="Case 91 aligned CSV/XLSX path")
     parser.add_argument("--image_dir", type=str, required=True, help="Directory of extracted case 91 frames")
     parser.add_argument("--output_csv", type=str, default="case91_predictions.csv")
@@ -148,12 +153,13 @@ def main():
     loader = DataLoader(
         dataset,
         batch_size=args.batch_size,
-        shuffle=False,
+        shuffle=False, # No shuffling
         num_workers=args.num_workers,
         pin_memory=torch.cuda.is_available(),
     )
 
     model = ResNet18Regressor().to(device)
+    # Load training checkpoint for ResNet-18
     state_dict = torch.load(args.checkpoint, map_location=device)
     model.load_state_dict(state_dict)
 
