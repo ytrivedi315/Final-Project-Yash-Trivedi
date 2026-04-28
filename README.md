@@ -9,6 +9,7 @@ This repository has four folders:
    - case84_aligned_frames and case91_aligned_frames python files used to split videos into frames aligned with data points
    - train_resnet18.py holds training program usign the ResNet 18 pretrained model
    - test_resnet18.py is matching test file to test on ResNet 18 pretrained model
+   - several other similar train and test files from different experiments
    - Two folders which contain 1200 frames from each video test set
 2. Final-Project-Report: Contains final report document
 3. Final Presentation: Contains final presentation
