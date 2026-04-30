@@ -33,13 +33,6 @@ class CHFFrameDataset(Dataset):
     """
     Dataset for single-frame CHF proximity regression.
 
-    Expected CSV/XLSX columns:
-      - frame_filename: image filename for each aligned frame
-      - CHF proximity: regression target in [0, 1]
-
-    The aligned-frame CSV produced earlier already contains frame filenames;
-    if frame_filename is missing but frame_index exists, this class will build
-    names like frame_000123.jpg.
     """
 
     def __init__(self, annotations_path: str, image_dir: str, transform=None):
